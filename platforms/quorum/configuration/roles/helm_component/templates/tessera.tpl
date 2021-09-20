@@ -62,6 +62,7 @@ spec:
       dburl: "jdbc:mysql://{{ peer.name }}-tessera:3306/demodb"
       dbusername: demouser
 {% if network.config.tm_tls == 'strict' %}
+      tls: "STRICT"
       url: "https://{{ peer.name }}.{{ external_url }}:{{ peer.transaction_manager.ambassador }}"
 {% else %}
       url: "http://{{ peer.name }}.{{ external_url }}:{{ peer.transaction_manager.ambassador }}"
