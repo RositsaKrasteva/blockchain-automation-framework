@@ -30,20 +30,18 @@ data:
           "enabled": true,
           "serverAddress": {{ .Values.tessera.clienturl | quote }},          
           "sslConfig": {
-            "tls": "OFF",
+            "tls": {{ .Values.tessera.tls | quote }},
             "generateKeyStoreIfNotExisted": true,
-            "serverKeyStore": "{{ .Values.node.mountPath }}/tm/server-keystore",
-            "serverKeyStorePassword": "quorum",
-            "serverTrustStore": "{{ .Values.node.mountPath }}/tm/server-truststore",
-            "serverTrustStorePassword": "quorum",
-            "serverTrustMode": {{ .Values.tessera.trust | quote }},
-            "knownClientsFile": "{{ .Values.node.mountPath }}/tm/knownClients",
-            "clientKeyStore": "{{ .Values.node.mountPath }}/tm/client-keystore",
-            "clientKeyStorePassword": "quorum",
-            "clientTrustStore": "{{ .Values.node.mountPath }}/tm/client-truststore",
-            "clientTrustStorePassword": "quorum",
+            "serverKeyStore": "{{ .Values.node.mountPath }}/crypto/tessera_cer.key",
+            "serverTlsCertificatePath": "{{ .Values.node.mountPath }}/crypto/tessera_cer.pem",
+            "serverTrustCertificates": ["{{ .Values.node.mountPath }}/crypto/tessera_ca.pem"],
             "clientTrustMode": {{ .Values.tessera.trust | quote }},
-            "knownServersFile": "{{ .Values.node.mountPath }}/tm/knownServers"
+            "clientTlsKeyPath": "{{ .Values.node.mountPath }}/crypto/tessera_cer.key",
+            "clientTlsCertificatePath": "{{ .Values.node.mountPath }}/crypto/tessera_cer.pem",
+            "clientTrustCertificates": ["{{ .Values.node.mountPath }}/crypto/tessera_ca.pem"],
+            "knownClientsFile": "{{ .Values.node.mountPath }}/crypto/known_client1",
+            "knownServersFile": "{{ .Values.node.mountPath }}/crypto/known_server1",
+            "clientAuth": true
           },
           "communicationType": "REST"
         },
@@ -52,20 +50,18 @@ data:
           "enabled": true,
           "serverAddress": {{ .Values.tessera.url | quote }},
           "sslConfig": {
-            "tls": {{ .Values.tessera.tls | quote }},
+           "tls": {{ .Values.tessera.tls | quote }},
             "generateKeyStoreIfNotExisted": true,
-            "serverKeyStore": "{{ .Values.node.mountPath }}/tm/server-keystore",
-            "serverKeyStorePassword": "quorum",
-            "serverTrustStore": "{{ .Values.node.mountPath }}/tm/server-truststore",
-            "serverTrustStorePassword": "quorum",
             "serverTrustMode": {{ .Values.tessera.trust | quote }},
-            "knownClientsFile": "{{ .Values.node.mountPath }}/tm/knownClients",
-            "clientKeyStore": "{{ .Values.node.mountPath }}/tm/client-keystore",
-            "clientKeyStorePassword": "quorum",
-            "clientTrustStore": "{{ .Values.node.mountPath }}/tm/client-truststore",
-            "clientTrustStorePassword": "quorum",
+            "serverTlsKeyPath": "{{ .Values.node.mountPath }}/crypto/tessera_cer.key",
+            "serverTlsCertificatePath": "{{ .Values.node.mountPath }}/crypto/tessera_cer.pem",
+            "serverTrustCertificates": ["{{ .Values.node.mountPath }}/crypto/tessera_ca.pem"],            
             "clientTrustMode": {{ .Values.tessera.trust | quote }},
-            "knownServersFile": "{{ .Values.node.mountPath }}/tm/knownServers"
+            "clientTlsKeyPath": "{{ .Values.node.mountPath }}/crypto/tessera_cer.key",
+            "clientTlsCertificatePath": "{{ .Values.node.mountPath }}/crypto/tessera_cer.pem",
+            "clientTrustCertificates": ["{{ .Values.node.mountPath }}/crypto/tessera_ca.pem"],
+            "knownClientsFile": "{{ .Values.node.mountPath }}/crypto/known_client2",
+            "knownServersFile": "{{ .Values.node.mountPath }}/crypto/known_server2"
           },
           "communicationType": "REST"
         }
@@ -75,9 +71,9 @@ data:
         "passwords": [],
         "keyData": [
           {
-            "privateKeyPath": "%THIS_PRIV_KEY%",
-            "publicKeyPath": "%THIS_PUB_KEY%"
-          }
+           "privateKeyPath": "%THIS_PRIV_KEY%",
+           "publicKeyPath": "%THIS_PUB_KEY%"}
+           
         ]
       },
       "alwaysSendTo": []
