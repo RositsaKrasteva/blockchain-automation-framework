@@ -102,7 +102,7 @@ spec:
           validateVaultResponse 'vault login token' "${VAULT_CLIENT_TOKEN}"
 
           vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.keyname }}"
-          echo "Getting 2 keys from $vault_secret_key"          
+          echo "Getting 5 keys from $vault_secret_key"          
           LOOKUP_SECRET_RESPONSE=$(curl -sS \
             --header "X-Vault-Token:${VAULT_CLIENT_TOKEN}" \
             ${VAULT_ADDR}/v1/${vault_secret_key} | \
@@ -110,15 +110,7 @@ spec:
           validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
           nodekey=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["nodekey"]')
           keystore=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["keystore"]')
-
-          vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.keyname }}"
-          echo "Getting 3 keys from $vault_secret_key"          
-          LOOKUP_SECRET_RESPONSE=$(curl -sS \
-            --header "X-Vault-Token:${VAULT_CLIENT_TOKEN}" \
-            ${VAULT_ADDR}/v1/${vault_secret_key} | \
-            jq -r 'if .errors then . else . end')
-          validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"  
-          gethpassword=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["gethpassword"]')
+  	      gethpassword=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["gethpassword"]')
           username=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["db_user"]')
           password=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["db_password"]')
           
@@ -144,29 +136,26 @@ spec:
           echo -n "${tmpub}" > ${OUTPUT_PATH}/tm.pub
           echo -n "${tmkey}" > ${OUTPUT_PATH}/tm.key   
 
-           if [ {{ $.Values.tessera.tls }} == "STRICT" ]
-          then
-            vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.tlsdir }}" 
-            LOOKUP_SECRET_RESPONSE=$(curl -sS \
-              --header "X-Vault-Token:${VAULT_CLIENT_TOKEN}" \
-              ${VAULT_ADDR}/v1/${vault_secret_key} | \
-              jq -r 'if .errors then . else . end')
-            validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE" 
-            tessera_ca=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["rootca_pem"]' | base64 -d)  
-            tessera_cer_pem=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["ambassadorcrt"]' | base64 -d)    
-            tessera_cer_key=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["ambassadorkey"]' | base64 -d) 
-            tessera_known_server=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["knownServer"]'| base64 -d) 
-            keystore=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["keystore"]')  
-            keystore_password=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["password"]' | base64 -d)
-            echo "${tessera_ca}" > ${MOUNT_PATH}/tessera_ca.pem
-            echo "${tessera_cer_pem}" > ${MOUNT_PATH}/tessera_cer.pem
-            echo "${tessera_cer_key}" > ${MOUNT_PATH}/tessera_cer.key
-            echo "${tessera_known_server}" > ${MOUNT_PATH}/known_server
-            echo "${tessera_known_server}" > ${MOUNT_PATH}/known_client
-            echo "${keystore}" > ${MOUNT_PATH}/keystore
-            base64 -d ${MOUNT_PATH}/keystore > ${MOUNT_PATH}/keystore.pkcs12
-            echo "${keystore_password}" > ${MOUNT_PATH}/keystore_password
-          fi       
+          vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.tlsdir }}" 
+          LOOKUP_SECRET_RESPONSE=$(curl -sS \
+            --header "X-Vault-Token:${VAULT_CLIENT_TOKEN}" \
+            ${VAULT_ADDR}/v1/${vault_secret_key} | \
+            jq -r 'if .errors then . else . end')
+          validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE" 
+          tessera_ca=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["rootca_pem"]' | base64 -d)  
+          tessera_cer_pem=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["ambassadorcrt"]' | base64 -d)    
+          tessera_cer_key=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["ambassadorkey"]' | base64 -d) 
+          tessera_known_server=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["knownServer"]'| base64 -d) 
+          keystore=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["keystore"]')  
+          keystore_password=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["password"]' | base64 -d)
+          echo "${tessera_ca}" > ${MOUNT_PATH}/tessera_ca.pem
+          echo "${tessera_cer_pem}" > ${MOUNT_PATH}/tessera_cer.pem
+          echo "${tessera_cer_key}" > ${MOUNT_PATH}/tessera_cer.key
+          echo "${tessera_known_server}" > ${MOUNT_PATH}/known_server
+          echo "${tessera_known_server}" > ${MOUNT_PATH}/known_client
+          echo "${keystore}" > ${MOUNT_PATH}/keystore
+          base64 -d ${MOUNT_PATH}/keystore > ${MOUNT_PATH}/keystore.pkcs12
+          echo "${keystore_password}" > ${MOUNT_PATH}/keystore_password
 
         volumeMounts:
         - name: certificates
@@ -239,13 +228,14 @@ spec:
           
           TESSERA_JAR=/tessera/tessera-app.jar;
            
-          CONFIG_TMPL=$(cat ${QUORUM_HOME}/tessera-config.json.tmpl);
+           CONFIG_TMPL=$(cat ${QUORUM_HOME}/tessera-config.json.tmpl);
+          CONFIG_FINAL=$(echo $CONFIG_TMPL | sed \"s@%THIS_PRIV_KEY%@${QUORUM_HOME}/crypto/keys/tm.key@g\" |  sed \"s@%THIS_PUB_KEY%@${QUORUM_HOME}/crypto/keys/tm.pub@g\");
           
-          echo $CONFIG_TMPL >  ${DDIR}/tessera-config-with-hosts.json;
+          echo $CONFIG_FINAL >  ${DDIR}/tessera-config-with-hosts.json;
           cat  ${DDIR}/tessera-config-with-hosts.json;
 
           TESSERA_MAIN=com.quorum.tessera.launcher.Main;
-          java -Xms128M -Xmx128M -cp $SQL_JAR:$TESSERA_JAR:. $TESSERA_MAIN --configfile ${DDIR}/tessera-config-with-hosts.json -o jdbc.password=$PASSWORD;
+          java -Xms128M -Xmx128M -cp $SQL_JAR:$TESSERA_JAR:. $TESSERA_MAIN -configfile ${DDIR}/tessera-config-with-hosts.json -o jdbc.password=$PASSWORD;
         "
         ports:
           - containerPort: {{ .Values.node.ports.tm }}
