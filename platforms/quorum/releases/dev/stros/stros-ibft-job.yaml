@@ -1,0 +1,30 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: stros-ibft-job
+  namespace: stros-quo
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: stros-ibft-job
+  chart:
+    git: https://github.com/RositsaKrasteva/blockchain-automation-framework.git
+    ref: feature-386
+    path: platforms/quorum/charts/crypto_ibft
+  values:
+    peer:
+      name: stros
+      gethPassphrase: 12345
+    metadata:
+      namespace: stros-quo
+    image:
+      initContainerName: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+      node: quorumengineering/quorum:21.4.2
+      pullPolicy: Always
+    acceptLicense: YES
+    vault:
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      role: vault-role
+      authpath: quorumstros
+      serviceaccountname: vault-auth
+      certsecretprefix: secret/stros-quo
