@@ -1,0 +1,82 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: warroswarrosquroum
+  namespace: warros-quo
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: warroswarrosquroum
+  helmVersion: v3
+  chart:
+    git: https://github.com/RositsaKrasteva/blockchain-automation-framework.git
+    ref: feature-386
+    path: platforms/quorum/charts/node_quorum  
+  values:
+    replicaCount: 1
+    metadata:
+      namespace: warros-quo
+      labels:
+    images:
+      node: quorumengineering/quorum:21.4.2
+      alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+      tessera: quorumengineering/tessera:21.4.0
+      busybox: busybox
+      mysql: mysql/mysql-server:5.7
+    node:
+      name: warros
+      status: default
+      consensus: ibft
+      subject: O=Warehouse,OU=Warehouse,L=42.36/-71.06/Boston,C=US
+      mountPath: /etc/quorum/qdata
+      imagePullSecret: regcred
+      keystore: keystore_1
+      
+      servicetype: ClusterIP
+      lock: false
+      ports:
+        rpc: 8546
+        raft: 50401
+        tm: 443
+        quorum: 21000
+        db: 3306
+      dbname: demodb
+      mysqluser: demouser
+    vault:
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      secretprefix: secret/warros-quo/crypto/warros
+      serviceaccountname: vault-auth
+      keyname: quorum
+      tm_keyname: transaction
+      role: vault-role
+      authpath: quorumwarros
+    tessera:
+      dburl: "jdbc:mysql://warros-tessera:3306/demodb"
+      dbusername: demouser
+      url: "https://warros.quo.dev2.aws.blockchaincloudpoc-develop.com:443"
+      clienturl: "http://warros-tessera:8888" #TODO: Enable tls strict for q2t
+      othernodes:
+        - url: https://caros.quo.dev2.aws.blockchaincloudpoc-develop.com
+        - url: https://maros.quo.dev2.aws.blockchaincloudpoc-develop.com
+        - url: https://stros.quo.dev2.aws.blockchaincloudpoc-develop.com
+        - url: https://warros.quo.dev2.aws.blockchaincloudpoc-develop.com
+      tls: "STRICT"
+      trust: "TOFU"
+    genesis: ewogICJjb25maWciOiB7CiAgICAiY2hhaW5JZCI6IDEwLAogICAgImhvbWVzdGVhZEJsb2NrIjogMCwKICAgICJlaXAxNTBCbG9jayI6IDAsCiAgICAiZWlwMTUwSGFzaCI6ICIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLAogICAgImVpcDE1NUJsb2NrIjogMCwKICAgICJlaXAxNThCbG9jayI6IDAsCiAgICAiYnl6YW50aXVtQmxvY2siOiAwLAogICAgImNvbnN0YW50aW5vcGxlQmxvY2siOiAwLAogICAgInBldGVyc2J1cmdCbG9jayI6IDAsCiAgICAiaXN0YW5idWxCbG9jayI6IDAsCiAgICAiaXN0YW5idWwiOiB7CiAgICAgICJlcG9jaCI6IDMwMDAwLAogICAgICAicG9saWN5IjogMCwKICAgICAgImNlaWwyTmJ5M0Jsb2NrIjogMAogICAgfSwKICAgICJ0eG5TaXplTGltaXQiOiAxMjgsCiAgICAicWlwNzE0QmxvY2siOiAwLAogICAgImlzTVBTIjogZmFsc2UsCiAgICAiaXNRdW9ydW0iOiB0cnVlLAogICAgIm1heENvZGVTaXplQ29uZmlnIjogWwogICAgICB7CiAgICAgICAgImJsb2NrIjogMCwKICAgICAgICAic2l6ZSI6IDEyOAogICAgICB9CiAgICBdCiAgfSwKICAibm9uY2UiOiAiMHgwIiwKICAidGltZXN0YW1wIjogIjB4NjE0OWQ1YjEiLAogICJleHRyYURhdGEiOiAiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwZjg5YWY4NTQ5NDEyMDMxYjllN2NiMzIzYTVkMzcwZDQ0YjBkOTM2MDEzZmJlYTAxNWE5NGU4MTFlNzk2YjBhODBiMTc0NmE3YzY1NTFlNjk3MWYxOTIxMTYwYWI5NDE5NzU1OWZlMTUxMzRkMWRiMTE3ZGVkOGI3NWI5NjQ3MGM0MGM0MDI5NGZjNWU1M2I3MTZmYjRiYjQ3MDhlYTc4MDA5MGU3YzFmOTMzMDk1ZDNiODQxMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMGMwIiwKICAiZ2FzTGltaXQiOiAiMHhlMDAwMDAwMCIsCiAgImRpZmZpY3VsdHkiOiAiMHgxIiwKICAibWl4SGFzaCI6ICIweDYzNzQ2OTYzNjE2YzIwNjI3OTdhNjE2ZTc0Njk2ZTY1MjA2NjYxNzU2Yzc0MjA3NDZmNmM2NTcyNjE2ZTYzNjUiLAogICJjb2luYmFzZSI6ICIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLAogICJhbGxvYyI6IHsKICAgICIxMjAzMWI5ZTdjYjMyM2E1ZDM3MGQ0NGIwZDkzNjAxM2ZiZWEwMTVhIjogewogICAgICAiYmFsYW5jZSI6ICIweDQ0NmMzYjE1Zjk5MjY2ODdkMmM0MDUzNGZkYjU2NDAwMDAwMDAwMDAwMCIKICAgIH0sCiAgICAiMTk3NTU5ZmUxNTEzNGQxZGIxMTdkZWQ4Yjc1Yjk2NDcwYzQwYzQwMiI6IHsKICAgICAgImJhbGFuY2UiOiAiMHg0NDZjM2IxNWY5OTI2Njg3ZDJjNDA1MzRmZGI1NjQwMDAwMDAwMDAwMDAiCiAgICB9LAogICAgImU4MTFlNzk2YjBhODBiMTc0NmE3YzY1NTFlNjk3MWYxOTIxMTYwYWIiOiB7CiAgICAgICJiYWxhbmNlIjogIjB4NDQ2YzNiMTVmOTkyNjY4N2QyYzQwNTM0ZmRiNTY0MDAwMDAwMDAwMDAwIgogICAgfSwKICAgICJmYzVlNTNiNzE2ZmI0YmI0NzA4ZWE3ODAwOTBlN2MxZjkzMzA5NWQzIjogewogICAgICAiYmFsYW5jZSI6ICIweDQ0NmMzYjE1Zjk5MjY2ODdkMmM0MDUzNGZkYjU2NDAwMDAwMDAwMDAwMCIKICAgIH0KICB9LAogICJudW1iZXIiOiAiMHgwIiwKICAiZ2FzVXNlZCI6ICIweDAiLAogICJwYXJlbnRIYXNoIjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIKfQ==
+    staticnodes: 
+      [
+    "enode://e5c0f78b5ce61e616167b9f514968c95c3da76e8c7524ab31ba14edfda600c4f2d28f6281bc5a24efad268e954f031d2a9faa3ad2b36433ca72470d695b56bec@caros.quo.dev2.aws.blockchaincloudpoc-develop.com:15090?discport=0",
+    "enode://ecdc158cb840f80e24b32dc73d885058f038445c2a51c93eeae59aeeb8419817ab39ddf25b8543b4fb19f077df3ab75d63e74bda1a273a64119652db1cd7d1ba@maros.quo.dev2.aws.blockchaincloudpoc-develop.com:15020?discport=0",
+    "enode://b5d2df919ceab9db92fb6acdce3cf8610a7d100a97d3cbf950f9213bff801386c13c4bc48454aec6d153878c7703893cc443e85cf9ce286b83b18bd30064556b@stros.quo.dev2.aws.blockchaincloudpoc-develop.com:15030?discport=0",
+    "enode://a6addae09d1e14e9bce0c2ea17f273521e51f99399318f9fcc55a96ab3e0aa5068df6e2c9e892497e393a276cf1fc8ef8a761bdde52896f87beee356ee46ef7c@warros.quo.dev2.aws.blockchaincloudpoc-develop.com:15040?discport=0"
+]
+    proxy:
+      provider: "ambassador"
+      external_url: warros.quo.dev2.aws.blockchaincloudpoc-develop.com
+      portTM: 443
+      rpcport: 15041
+      quorumport: 15040
+    storage:
+      storageclassname: awsstorageclass
+      storagesize: 1Gi
+      dbstorage: 1Gi
