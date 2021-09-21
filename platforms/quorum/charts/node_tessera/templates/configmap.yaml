@@ -32,6 +32,7 @@ data:
           "sslConfig": {
             "tls": {{ .Values.tessera.tls | quote }},
             "generateKeyStoreIfNotExisted": true,
+            "serverTrustMode": {{ .Values.tessera.trust | quote }},
             "serverKeyStore": "{{ .Values.node.mountPath }}/tm/tessera_cer.key",
             "serverTlsCertificatePath": "{{ .Values.node.mountPath }}/tm/tessera_cer.pem",
             "serverTrustCertificates": ["{{ .Values.node.mountPath }}/tm/tessera_ca.pem"],
