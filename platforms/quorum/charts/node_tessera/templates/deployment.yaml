@@ -135,7 +135,7 @@ spec:
           tmkey=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r '.data["key"]' | base64 -d )
           echo -n "${tmpub}" > ${OUTPUT_PATH}/tm.pub
           echo -n "${tmkey}" > ${OUTPUT_PATH}/tm.key 
-            
+
           if [ {{ $.Values.tessera.tls }} == "STRICT" ]
           then
             vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.tlsdir }}" 
@@ -188,7 +188,7 @@ spec:
       containers:
       - name: mysql-db
         image: {{ .Values.images.mysql }}
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         env:
         - name: "MYSQL_ROOT_PASSWORD"
           value: ""
