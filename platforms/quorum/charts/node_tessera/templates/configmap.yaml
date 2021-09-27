@@ -72,8 +72,8 @@ data:
         "passwords": [],
         "keyData": [
           {
-             "privateKeyPath": "%THIS_PRIV_KEY%",
-            "publicKeyPath": "%THIS_PUB_KEY%"
+            "privateKeyPath": "{{ .Values.node.mountPath }}/crypto/keys/tm.key",
+            "publicKeyPath": "{{ .Values.node.mountPath }}/crypto/keys/tm.pub"
           }
         ]
       },
