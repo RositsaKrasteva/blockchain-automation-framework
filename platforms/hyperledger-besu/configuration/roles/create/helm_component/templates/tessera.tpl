@@ -72,7 +72,7 @@ spec:
       serviceaccountname: vault-auth
       keyname: credentials
       tm_keyname: tm
-      tlsdir: tls
+      tlsdir: certs
       role: vault-role
       authpath: besu{{ org.name | lower }}
 {% if network.env.proxy == 'ambassador' %} 
