@@ -1,0 +1,30 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: maros-ibft-job
+  namespace: maros-quo
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: maros-ibft-job
+  chart:
+    git: https://github.com/RositsaKrasteva/blockchain-automation-framework.git
+    ref: feature-386
+    path: platforms/quorum/charts/crypto_ibft
+  values:
+    peer:
+      name: maros
+      gethPassphrase: 12345
+    metadata:
+      namespace: maros-quo
+    image:
+      initContainerName: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+      node: quorumengineering/quorum:21.4.2
+      pullPolicy: Always
+    acceptLicense: YES
+    vault:
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      role: vault-role
+      authpath: quorummaros
+      serviceaccountname: vault-auth
+      certsecretprefix: secret/maros-quo
