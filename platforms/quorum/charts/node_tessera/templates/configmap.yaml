@@ -33,7 +33,7 @@ data:
             "tls": {{ .Values.tessera.tls | quote }},
             "generateKeyStoreIfNotExisted": true,
             "serverTrustMode": {{ .Values.tessera.trust | quote }},
-           "serverTlsKeyPath": "{{ .Values.node.mountPath }}/crypto/tessera_cer.key",
+            "serverTlsKeyPath": "{{ .Values.node.mountPath }}/crypto/tessera_cer.key",
             "serverTlsCertificatePath": "{{ .Values.node.mountPath }}/crypto/tessera_cer.pem",
             "serverTrustCertificates": ["{{ .Values.node.mountPath }}/crypto/tessera_ca.pem"],
             "clientTrustMode": {{ .Values.tessera.trust | quote }},
@@ -54,15 +54,15 @@ data:
             "tls": {{ .Values.tessera.tls | quote }},
             "generateKeyStoreIfNotExisted": true,
             "serverTrustMode": {{ .Values.tessera.trust | quote }},
-            "serverTlsKeyPath": "{{ .Values.node.mountPath }}/tm/tessera_cer.key",
-            "serverTlsCertificatePath": "{{ .Values.node.mountPath }}/tm/tessera_cer.pem",
-            "serverTrustCertificates": ["{{ .Values.node.mountPath }}/tm/tessera_ca.pem"],            
+            "serverTlsKeyPath": "{{ .Values.node.mountPath }}/crypto/tessera_cer.key",
+            "serverTlsCertificatePath": "{{ .Values.node.mountPath }}/crypto/tessera_cer.pem",
+            "serverTrustCertificates": ["{{ .Values.node.mountPath }}/crypto/tessera_ca.pem"],            
             "clientTrustMode": {{ .Values.tessera.trust | quote }},
-            "clientTlsKeyPath": "{{ .Values.node.mountPath }}/tm/tessera_cer.key",
-            "clientTlsCertificatePath": "{{ .Values.node.mountPath }}/tm/tessera_cer.pem",
-            "clientTrustCertificates": ["{{ .Values.node.mountPath }}/tm/tessera_ca.pem"],
-            "knownClientsFile": "{{ .Values.node.mountPath }}/tm/known_client2",
-            "knownServersFile": "{{ .Values.node.mountPath }}/tm/known_server2"
+            "clientTlsKeyPath": "{{ .Values.node.mountPath }}/crypto/tessera_cer.key",
+            "clientTlsCertificatePath": "{{ .Values.node.mountPath }}/crypto/tessera_cer.pem",
+            "clientTrustCertificates": ["{{ .Values.node.mountPath }}/crypto/tessera_ca.pem"],
+            "knownClientsFile": "{{ .Values.node.mountPath }}/crypto/known_client2",
+            "knownServersFile": "{{ .Values.node.mountPath }}/crypto/known_server2"
           },
           "communicationType": "REST"
         }
