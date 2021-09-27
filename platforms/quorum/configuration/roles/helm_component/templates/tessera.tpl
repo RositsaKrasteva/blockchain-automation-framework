@@ -57,6 +57,7 @@ spec:
       keyname: quorum
       tm_keyname: transaction
       role: vault-role
+      tlsdir: certs
       authpath: quorum{{ name }}
     tessera:
       dburl: "jdbc:mysql://{{ peer.name }}-tessera:3306/demodb"

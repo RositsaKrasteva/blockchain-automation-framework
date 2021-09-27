@@ -138,7 +138,7 @@ spec:
 
           if [ {{ $.Values.tessera.tls }} == "STRICT" ]
           then
-            vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.tlsdir }}" 
+            vault_secret_key="${VAULT_SECRET_PREFIX}/certs" 
             LOOKUP_SECRET_RESPONSE=$(curl -sS \
               --header "X-Vault-Token:${VAULT_CLIENT_TOKEN}" \
               ${VAULT_ADDR}/v1/${vault_secret_key} | \
