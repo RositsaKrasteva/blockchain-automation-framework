@@ -223,8 +223,10 @@ spec:
           tar -xf mysql-connector-java-8.0.25.tar.gz;
           cp /mysql-connector-java-8.0.25/mysql-connector-java-8.0.25.jar $QUORUM_HOME;
           SQL_JAR=$QUORUM_HOME/mysql-connector-java-8.0.25.jar;
-
-
+          # Extracting version from manifest incase we want to add version specific steps/config
+          TESSERA_VERSION=$(unzip -p /tessera/tessera-app.jar META-INF/MANIFEST.MF | grep Tessera-Version | cut -d\" \" -f2);
+          echo \"Tessera version (extracted from manifest file): ${TESSERA_VERSION}\";
+          
           TESSERA_JAR=/tessera/tessera-app.jar;
            
           CONFIG_TMPL=$(cat ${QUORUM_HOME}/tessera-config.json.tmpl);

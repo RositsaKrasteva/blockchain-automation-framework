@@ -98,7 +98,7 @@ spec:
       containers:
       - name: generate-cryptomaterials
         image: {{ $.Values.image.node }}
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         volumeMounts:
           - name: certcheck
             mountPath: /certcheck
