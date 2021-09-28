@@ -12,7 +12,6 @@ metadata:
 data:
   tessera-config.json.tmpl: |-
     {
-    "mode": "orion", 
     "useWhiteList": "false",
       "jdbc": {
         "username": {{ .Values.tessera.dbusername | quote }},
