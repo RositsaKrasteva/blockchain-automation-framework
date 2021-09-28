@@ -1,0 +1,85 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: strosstrostessera
+  namespace: stros-quo
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: strosstrostessera
+  helmVersion: v3
+  chart:
+    git: https://github.com/RositsaKrasteva/blockchain-automation-framework.git
+    ref: feature-386
+    path: platforms/quorum/charts/node_tessera  
+  values:
+    replicaCount: 1
+    metadata:
+      namespace: stros-quo
+      labels:
+    images:
+      node: quorumengineering/quorum:21.4.2
+      alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+      tessera: quorumengineering/tessera:21.4.0
+      busybox: busybox
+      mysql: mysql/mysql-server:5.7
+    node:
+      name: stros
+      status: default
+      consensus: ibft
+      subject: O=Store,OU=Store,L=40.73/-74/New York,C=US
+      mountPath: /etc/quorum/qdata
+      imagePullSecret: regcred
+      keystore: keystore_1
+      
+      servicetype: ClusterIP
+      lock: false
+      ports:
+        rpc: 8546
+        raft: 50401
+        tm: 443
+        quorum: 21000
+        db: 3306
+      dbname: demodb
+      mysqluser: demouser
+    vault:
+      address: http://vault.internal.dev2.aws.blockchaincloudpoc-develop.com:20001
+      secretprefix: secret/stros-quo/crypto/stros
+      serviceaccountname: vault-auth
+      keyname: quorum
+      tm_keyname: transaction
+      role: vault-role
+      tlsdir: certs
+      authpath: quorumstros
+    tessera:
+      dburl: "jdbc:mysql://stros-tessera:3306/demodb"
+      dbusername: demouser
+      tls: "STRICT"
+      url: "https://stros.quo.dev2.aws.blockchaincloudpoc-develop.com:443"
+      clienturl: "http://stros-tessera:8888" #TODO: Enable tls strict for q2t
+      othernodes:
+        - url: https://caros.quo.dev2.aws.blockchaincloudpoc-develop.com
+        - url: https://maros.quo.dev2.aws.blockchaincloudpoc-develop.com
+        - url: https://stros.quo.dev2.aws.blockchaincloudpoc-develop.com
+        - url: https://warros.quo.dev2.aws.blockchaincloudpoc-develop.com
+      tls: "STRICT"
+      trust: "TOFU"
+    genesis: ewogICJjb25maWciOiB7CiAgICAiY2hhaW5JZCI6IDEwLAogICAgImhvbWVzdGVhZEJsb2NrIjogMCwKICAgICJlaXAxNTBCbG9jayI6IDAsCiAgICAiZWlwMTUwSGFzaCI6ICIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLAogICAgImVpcDE1NUJsb2NrIjogMCwKICAgICJlaXAxNThCbG9jayI6IDAsCiAgICAiYnl6YW50aXVtQmxvY2siOiAwLAogICAgImNvbnN0YW50aW5vcGxlQmxvY2siOiAwLAogICAgInBldGVyc2J1cmdCbG9jayI6IDAsCiAgICAiaXN0YW5idWxCbG9jayI6IDAsCiAgICAiaXN0YW5idWwiOiB7CiAgICAgICJlcG9jaCI6IDMwMDAwLAogICAgICAicG9saWN5IjogMCwKICAgICAgImNlaWwyTmJ5M0Jsb2NrIjogMAogICAgfSwKICAgICJ0eG5TaXplTGltaXQiOiAxMjgsCiAgICAicWlwNzE0QmxvY2siOiAwLAogICAgImlzTVBTIjogZmFsc2UsCiAgICAiaXNRdW9ydW0iOiB0cnVlLAogICAgIm1heENvZGVTaXplQ29uZmlnIjogWwogICAgICB7CiAgICAgICAgImJsb2NrIjogMCwKICAgICAgICAic2l6ZSI6IDEyOAogICAgICB9CiAgICBdCiAgfSwKICAibm9uY2UiOiAiMHgwIiwKICAidGltZXN0YW1wIjogIjB4NjE1MmMzN2QiLAogICJleHRyYURhdGEiOiAiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwZjg5YWY4NTQ5NDMxN2EzZmUxYTU1MzdlMjE4M2UzMmRmZWEzMzEwMzZjMzVjMTkzZWU5NGY4YTRkYjI4MTQwZjI2ZWQ1MzNlNDYzNDhmYjUyZmZmMWM0ZmQwMDg5NDVkNTNkYjQyMGM0YjEwN2UyZTljMTgwMjMzNTJhMjk2OWU3ZDlmMGY5NGE1MzZiMDNmZjE1ODBkMDE2ZGU1MTM2OWZiNDY2MGZjNWE5NmZjNDNiODQxMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMGMwIiwKICAiZ2FzTGltaXQiOiAiMHhlMDAwMDAwMCIsCiAgImRpZmZpY3VsdHkiOiAiMHgxIiwKICAibWl4SGFzaCI6ICIweDYzNzQ2OTYzNjE2YzIwNjI3OTdhNjE2ZTc0Njk2ZTY1MjA2NjYxNzU2Yzc0MjA3NDZmNmM2NTcyNjE2ZTYzNjUiLAogICJjb2luYmFzZSI6ICIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLAogICJhbGxvYyI6IHsKICAgICIzMTdhM2ZlMWE1NTM3ZTIxODNlMzJkZmVhMzMxMDM2YzM1YzE5M2VlIjogewogICAgICAiYmFsYW5jZSI6ICIweDQ0NmMzYjE1Zjk5MjY2ODdkMmM0MDUzNGZkYjU2NDAwMDAwMDAwMDAwMCIKICAgIH0sCiAgICAiNWQ1M2RiNDIwYzRiMTA3ZTJlOWMxODAyMzM1MmEyOTY5ZTdkOWYwZiI6IHsKICAgICAgImJhbGFuY2UiOiAiMHg0NDZjM2IxNWY5OTI2Njg3ZDJjNDA1MzRmZGI1NjQwMDAwMDAwMDAwMDAiCiAgICB9LAogICAgImE1MzZiMDNmZjE1ODBkMDE2ZGU1MTM2OWZiNDY2MGZjNWE5NmZjNDMiOiB7CiAgICAgICJiYWxhbmNlIjogIjB4NDQ2YzNiMTVmOTkyNjY4N2QyYzQwNTM0ZmRiNTY0MDAwMDAwMDAwMDAwIgogICAgfSwKICAgICJmOGE0ZGIyODE0MGYyNmVkNTMzZTQ2MzQ4ZmI1MmZmZjFjNGZkMDA4IjogewogICAgICAiYmFsYW5jZSI6ICIweDQ0NmMzYjE1Zjk5MjY2ODdkMmM0MDUzNGZkYjU2NDAwMDAwMDAwMDAwMCIKICAgIH0KICB9LAogICJudW1iZXIiOiAiMHgwIiwKICAiZ2FzVXNlZCI6ICIweDAiLAogICJwYXJlbnRIYXNoIjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIKfQ==
+    staticnodes: 
+      [
+    "enode://712c639b29308fb89ed8a016a02ee9a79580aa1683a47e3958a369827e8e4ece9fdc2da606b6e159de5fe70a6331cdfdedf3b2c1a414c1e56a27d18f2ca6df12@caros.quo.dev2.aws.blockchaincloudpoc-develop.com:15090?discport=0",
+    "enode://3a2f3ad551f191bc6b1db71b8d931a59a215045ad7b3017eb22d1de0f5eba503ad0659981cf44a4cd8c71b5f38e6bafc339fc4c951e0178bdb7dfc1f902615ef@maros.quo.dev2.aws.blockchaincloudpoc-develop.com:15020?discport=0",
+    "enode://64bdc9b5ed86d4281fcaf1186e8de968aafe78fb2d24275efd89c11f6c9a33823daeb406ffafaeecefadfc99dcaf663a23c4dae477510ecdcf212ceae094e173@stros.quo.dev2.aws.blockchaincloudpoc-develop.com:15030?discport=0",
+    "enode://3fdd00eaa265cc73e9274fef8f034883db1355fe039907c470fa82ec385207c0ad753e7f127e4c8d631ca4d61927dcfd9dd443cfc77ad71d52599f3d7d7cde57@warros.quo.dev2.aws.blockchaincloudpoc-develop.com:15040?discport=0"
+]
+    proxy:
+      provider: "ambassador"
+      external_url: stros.quo.dev2.aws.blockchaincloudpoc-develop.com
+      portTM: 443
+      rpcport: 15031
+      quorumport: 15030
+      clientport: 8888
+    storage:
+      storageclassname: awsstorageclass
+      storagesize: 1Gi
+      dbstorage: 1Gi
